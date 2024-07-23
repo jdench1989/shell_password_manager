@@ -2,9 +2,9 @@
 
 #Prints welcome message
 echo
-echo "------------------------------"
+echo "*****************************"
 echo "Welcome to Password Manager!"
-echo "------------------------------"
+echo "*****************************"
 echo
 
 #Options assigned to a variable for easier repeatability 
@@ -20,9 +20,10 @@ while True; do
 	eval $options #Present available options
 	read -p "Enter your choice: " choice #Get input from user. 
 	choice_message="You have selected" # Placeholder message stored in variable to be concatenated during case statement
+	echo "------------------------------"
 	case $choice in
         1) 
-		# Choice 1. Enter a new password. Requests user input for service and password. Generates a unique password id. Concatenates all three fields and appends to vault.txt as comma delimitted string
+		# Choice 1. Enter a new password. Requests user input for service name and password. Generates a unique password id. Concatenates all three fields and appends to vault.txt as comma delimitted string
 		choice_message="$choice_message 'Enter a new password'"
 		echo $choice_message
 		read -p "Enter the name of the service for which to store a password: " service
@@ -31,13 +32,23 @@ while True; do
 		new_password_id=$((previous_password_id + 1))
 		echo "$new_password_id,$service,$password" >> vault.txt
 		echo "Password saved succesfully"
+		echo "------------------------------"
 		echo
 		;;
 
 		2) 
+		# Choice 2. Requests user input of a service name. Searches vault.txt column 2 for that service and then prints the associated password.
 		choice_message="$choice_message 'View a saved password'"
 		echo $choice_message
-		break
+		read -p "Enter the name of the service to be viewed: " service
+		requested_password=$(awk -F ',' -v serv="$service" '$2 == serv {print $3}' vault.txt)
+		if [ -n "$requested_password" ]; then
+			echo "The password for $service is: $requested_password"
+		else
+			echo "Service $service not found in the password vault."
+		fi
+		echo "------------------------------"
+		echo
 		;;
 
 		3) 
@@ -53,6 +64,7 @@ while True; do
 		;;
 
 		*) 
+		# All invalid inputs will echo an error message and loop will reiterate
 		echo "Invalid choice. Please try again"; echo ; echo "------------------------------"; echo
 	esac
 done
