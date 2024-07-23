@@ -16,19 +16,36 @@ while True; do
 	read -p "Enter your choice: " choice #Get input from user. 
 	choice_message="You have selected"
 	case $choice in
-		1) choice_message="$choice_message 'Enter a new password'"
+        1) 
+		choice_message="$choice_message 'Enter a new password'"
 		echo $choice_message
-		break;;
-		2) choice_message="$choice_message 'View a saved password'"
+		read -p "Enter the name of the service for which to store a password: " service
+		read -p "Enter the password: " password
+		previous_password_id=$(tail -n 1 vault.txt | awk -F ',' '{print $1}')
+		new_password_id=$((previous_password_id + 1))
+		echo "$new_password_id,$service,$password" >> vault.txt
+		;;
+
+		2) 
+		choice_message="$choice_message 'View a saved password'"
 		echo $choice_message
-		break;;
-		3) choice_message="$choice_message 'Delete a password'"
+		break
+		;;
+
+		3) 
+		choice_message="$choice_message 'Delete a password'"
 		echo $choice_message
-		break;;
-		4) choice_message="Goodbye!"
+		break
+		;;
+
+		4) 
+		choice_message="Goodbye!"
 		echo $choice_message
-		exit 1;;
-		*) echo "Invalid choice. Please try again"; echo ; echo "------------------------------"; echo
+		exit 1
+		;;
+		
+		*) 
+		echo "Invalid choice. Please try again"; echo ; echo "------------------------------"; echo
 	esac
 done
 
