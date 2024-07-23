@@ -24,6 +24,8 @@ while True; do
 		previous_password_id=$(tail -n 1 vault.txt | awk -F ',' '{print $1}')
 		new_password_id=$((previous_password_id + 1))
 		echo "$new_password_id,$service,$password" >> vault.txt
+		echo "Password saved succesfully"
+		echo
 		;;
 
 		2) 
@@ -43,7 +45,7 @@ while True; do
 		echo $choice_message
 		exit 1
 		;;
-		
+
 		*) 
 		echo "Invalid choice. Please try again"; echo ; echo "------------------------------"; echo
 	esac
