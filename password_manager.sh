@@ -13,13 +13,13 @@ options="echo -e 'Please select from the following options:\n1. Enter a new pass
 # Create vault.txt if it doesn't exist
 touch vault.txt
 
-# While loop presents available options and evaluates user input
+# 'While' loop presents available options and evaluates user input
 # User input 1, 2, or 3 will confirm the user's selection, carry out the appropriate action, then reset to option selection
 # User input 4 will exit the program
 while True; do
 	eval $options #Present available options
 	read -p "Enter your choice: " choice #Get input from user. 
-	choice_message="You have selected" # Placeholder message stored in variable to be concatenated during case statement
+	choice_message="You have selected:" # Placeholder message stored in variable to be concatenated during case statement
 	echo "------------------------------"
 	case $choice in
         1) 
@@ -42,6 +42,7 @@ while True; do
 		echo $choice_message
 		read -p "Enter the name of the service to be viewed: " service
 		requested_password=$(awk -F ',' -v serv="$service" '$2 == serv {print $3}' vault.txt)
+		# 'if' statement displays error if service is not recorded in vault.txt
 		if [ -n "$requested_password" ]; then
 			echo "The password for $service is: $requested_password"
 		else
@@ -52,19 +53,32 @@ while True; do
 		;;
 
 		3) 
+		# Choice 3. Requests user input of service to be deleted. Searches vault.txt for service and removes line if there is a match. 
 		choice_message="$choice_message 'Delete a password'"
 		echo $choice_message
-		break
+		read -p "Enter the name of the service to be deleted: " service
+		requested_deletion_line=$(awk -F ',' -v serv="$service" '$2 == serv {print NR}' vault.txt)
+		# 'if' statement displays error if service is not recorded in vault.txt
+		if [ -n "$requested_deletion_line" ]; then
+			# sed creates a copy of vault.txt called vault.txt.temp then replaces the original with the designated line removed. rm command deletes temp file after it is no longer needed
+			sed -i .temp "${requested_deletion_line}d" vault.txt ; rm vault.txt.temp 
+			echo "The password for $service has been deleted."
+		else
+			echo "Service $service not found in the password vault."
+		fi
+		echo "------------------------------"
+		echo
 		;;
 
 		4) 
+		# Displays exit message and exits program
 		choice_message="Goodbye!"
 		echo $choice_message
-		exit 1
+		exit 0
 		;;
 
 		*) 
-		# All invalid inputs will echo an error message and loop will reiterate
+		# All invalid inputs will display an error message and loop will reiterate, reprompting the user and displaying options
 		echo "Invalid choice. Please try again"; echo ; echo "------------------------------"; echo
 	esac
 done
