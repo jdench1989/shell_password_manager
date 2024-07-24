@@ -1,5 +1,0 @@
-1 facebook user2 password2
-2 instagram auser newpassword
-3 twitter barry cleverpass
-4 amazon john securepassword123
-5 google alice secopsisnotadirtyword
