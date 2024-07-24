@@ -108,6 +108,7 @@ while True; do
 				echo "Invalid selection"
 				echo "------------------------------"
 				echo
+				break
 			fi
 		done
 		;;
@@ -183,6 +184,7 @@ while True; do
 				echo "Invalid selection"
 				echo "------------------------------"
 				echo
+				break
 			fi
 		done
 		;;
