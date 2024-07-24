@@ -30,13 +30,22 @@ while True; do
 		read -p "Enter the name of the service for which to store/update a password: " service
 		existing_entry=$(awk -F ',' -v serv="$service" '$2 == serv {print  $0}' vault.txt)
 		if [ -n "$existing_entry" ]; then
-			read -p "Password entry already exists for $service. Would you like to update this entry? [y/n]: " choice
-			if [ "$choice" = "y" ]; then
-				read -p "Enter the new username: " new_user
-				read -p "Enter the new password: " new_pass
-				awk -F ',' -v serv="$service" -v user="$new_user" -v pass="$new_pass" 'BEGIN {OFS=","} $2 == serv {$3=user; $4=pass} {print}' vault.txt > tmpfile && mv tmpfile vault.txt
-				echo "Password updated successfully"
-			fi
+			while True; do
+				read -p "Password entry already exists for $service. Would you like to update this entry? [y/n]: " choice
+				if [ "$choice" = "y" ]; then
+					read -p "Enter the new username: " new_user
+					read -p "Enter the new password: " new_pass
+					awk -F ',' -v serv="$service" -v user="$new_user" -v pass="$new_pass" 'BEGIN {OFS=","} $2 == serv {$3=user; $4=pass} {print}' vault.txt > tmpfile && mv tmpfile vault.txt
+					echo "Password updated successfully"
+					echo "------------------------------"
+					echo
+					break
+				elif [ "$choice" = 'n' ]; then
+					break
+				else
+					echo "Invalid selection"
+				fi
+			done
 		else
 			read -p "Enter the username: " username
 			read -p "Enter the password: " password
