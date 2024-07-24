@@ -8,7 +8,7 @@ echo "*****************************"
 echo
 
 #Options assigned to a variable for easier repeatability 
-options="echo -e 'Please select from the following options:\n1. Enter a new password\n2. View a saved password\n3. Delete a password\n4. Exit Password Manager'"
+options="echo -e 'Please select from the following options:\n1. Enter a new password or update an existing password\n2. View saved passwords\n3. Delete passwords\n4. Exit Password Manager'"
 
 # Create vault.txt if it doesn't exist
 touch vault.txt
@@ -25,14 +25,18 @@ while True; do
 	case $choice in
         1) 
 		# Choice 1. Enter a new password. Requests user input for service name and password. Generates a unique password id. Concatenates all three fields and appends to vault.txt as comma delimitted string
-		choice_message="$choice_message 'Enter a new password'"
+		choice_message="$choice_message 'Enter a new password or update an existing password'"
 		echo $choice_message
-		read -p "Enter the name of the service for which to store a password: " service
+		read -p "Enter the name of the service for which to store/update a password: " service
 		existing_entry=$(awk -F ',' -v serv="$service" '$2 == serv {print  $0}' vault.txt)
 		if [ -n "$existing_entry" ]; then
-			echo "Password entry already exists for $service. Please update."
-			echo "------------------------------"
-			echo
+			read -p "Password entry already exists for $service. Would you like to update this entry? [y/n]: " choice
+			if [ "$choice" = "y" ]; then
+				read -p "Enter the new username: " new_user
+				read -p "Enter the new password: " new_pass
+				awk -F ',' -v serv="$service" -v user="$new_user" -v pass="$new_pass" 'BEGIN {OFS=","} $2 == serv {$3=user; $4=pass} {print}' vault.txt > tmpfile && mv tmpfile vault.txt
+				echo "Password updated successfully"
+			fi
 		else
 			read -p "Enter the username: " username
 			read -p "Enter the password: " password
