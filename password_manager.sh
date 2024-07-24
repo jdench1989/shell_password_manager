@@ -12,6 +12,7 @@ options="echo -e 'Please select from the following options:\n1. Enter a new pass
 
 # Create vault.txt if it doesn't exist
 touch vault.txt
+chmod 600 vault.txt
 
 # 'While' loop presents available options and evaluates user input
 # User input 1, 2, or 3 will confirm the user's selection, carry out the appropriate action, then reset to option selection
