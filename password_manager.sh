@@ -27,10 +27,11 @@ while True; do
 		choice_message="$choice_message 'Enter a new password'"
 		echo $choice_message
 		read -p "Enter the name of the service for which to store a password: " service
+		read -p "Enter the username: " username
 		read -p "Enter the password: " password
 		previous_password_id=$(tail -n 1 vault.txt | awk -F ',' '{print $1}')
 		new_password_id=$((previous_password_id + 1))
-		echo "$new_password_id,$service,$password" >> vault.txt
+		echo "$new_password_id,$service,$username,$password" >> vault.txt
 		echo "Password saved succesfully"
 		echo "------------------------------"
 		echo
@@ -39,11 +40,17 @@ while True; do
 		2) 
 		# Choice 2. Requests user input of a service name. Searches vault.txt column 2 for that service and then prints the associated password.
 		choice_message="$choice_message 'View a saved password'"
-		echo $choice_message
+		echo "$choice_message"
 		read -p "Enter the name of the service to be viewed: " service
-		requested_password=$(awk -F ',' -v serv="$service" '$2 == serv {print $3}' vault.txt)
+
+		# Retrieve both username and password in a single awk command
+		requested_credentials=$(awk -F ',' -v serv="$service" '$2 == serv {print $3, $4}' vault.txt)
+		requested_username=$(echo "$requested_credentials" | awk '{print $1}')
+		requested_password=$(echo "$requested_credentials" | awk '{print $2}')
+
 		# 'if' statement displays error if service is not recorded in vault.txt
-		if [ -n "$requested_password" ]; then
+		if [ -n "$requested_username" ] && [ -n "$requested_password" ]; then
+			echo "The username for $service is: $requested_username"
 			echo "The password for $service is: $requested_password"
 		else
 			echo "Service $service not found in the password vault."
