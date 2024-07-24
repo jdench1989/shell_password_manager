@@ -22,20 +22,23 @@ while True; do
 	read -p "Enter your choice: " choice #Get input from user. 
 	choice_message="You have selected:" # Placeholder message stored in variable to be concatenated during case statement
 	echo "------------------------------"
+	echo
 	case $choice in
         1) 
 		# Choice 1. Enter a new password. Requests user input for service name and password. Generates a unique password id. Concatenates all three fields and appends to vault.txt as comma delimitted string
 		choice_message="$choice_message 'Enter a new password or update an existing password'"
 		echo $choice_message
 		read -p "Enter the name of the service for which to store/update a password: " service
+		echo
 		existing_entry=$(awk -v serv="$service" '$2 == serv {print  $0}' vault.txt)
 		if [ -n "$existing_entry" ]; then
 			while True; do
 				read -p "Password entry already exists for $service. Would you like to update this entry? [y/n]: " choice
+				echo
 				if [ "$choice" = "y" ]; then
 					read -p "Enter the new username: " new_user
 					read -p "Enter the new password: " new_pass
-					awk -v serv="$service" -v user="$new_user" -v pass="$new_pass" 'BEGIN {OFS=","} $2 == serv {$3=user; $4=pass} {print}' vault.txt > tmpfile && mv tmpfile vault.txt
+					awk -v serv="$service" -v user="$new_user" -v pass="$new_pass" '$2 == serv {$3=user; $4=pass} {print}' vault.txt > tmpfile && mv tmpfile vault.txt
 					echo "Password updated successfully"
 					echo "------------------------------"
 					echo
@@ -44,6 +47,8 @@ while True; do
 					break
 				else
 					echo "Invalid selection"
+					echo "------------------------------"
+					echo
 				fi
 			done
 		else
@@ -63,21 +68,22 @@ while True; do
 		choice_message="$choice_message 'View a saved password'"
 		echo "$choice_message"
 		read -p "Enter the name of the service to be viewed: " service
-
+		echo
 		# Retrieve both username and password in a single awk command
 		requested_credentials=$(awk -v serv="$service" '$2 == serv {print $0}' vault.txt)
 		requested_username=$(echo "$requested_credentials" | awk '{print $3}')
 		requested_password=$(echo "$requested_credentials" | awk '{print $4}')
-
 		# 'if' statement displays error if service is not recorded in vault.txt
 		if [ -n "$requested_username" ] && [ -n "$requested_password" ]; then
 			echo "The username for $service is: $requested_username"
 			echo "The password for $service is: $requested_password"
+			echo "------------------------------"
+			echo
 		else
 			echo "Service $service not found in the password vault."
+			echo "------------------------------"
+			echo
 		fi
-		echo "------------------------------"
-		echo
 		;;
 
 		3) 
@@ -85,17 +91,21 @@ while True; do
 		choice_message="$choice_message 'Delete a password'"
 		echo $choice_message
 		read -p "Enter the name of the service to be deleted: " service
+		echo
 		requested_deletion_line=$(awk -v serv="$service" '$2 == serv {print NR}' vault.txt)
 		# 'if' statement displays error if service is not recorded in vault.txt
 		if [ -n "$requested_deletion_line" ]; then
 			# sed creates a copy of vault.txt called vault.txt.temp then replaces the original with the designated line removed. rm command deletes temp file after it is no longer needed
 			sed -i .temp "${requested_deletion_line}d" vault.txt ; rm vault.txt.temp 
 			echo "The password for $service has been deleted."
+			echo "------------------------------"
+			echo
 		else
 			echo "Service $service not found in the password vault."
+			echo "------------------------------"
+			echo
 		fi
-		echo "------------------------------"
-		echo
+
 		;;
 
 		4) 
