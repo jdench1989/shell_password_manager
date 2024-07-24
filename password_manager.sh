@@ -27,14 +27,21 @@ while True; do
 		choice_message="$choice_message 'Enter a new password'"
 		echo $choice_message
 		read -p "Enter the name of the service for which to store a password: " service
-		read -p "Enter the username: " username
-		read -p "Enter the password: " password
-		previous_password_id=$(tail -n 1 vault.txt | awk -F ',' '{print $1}')
-		new_password_id=$((previous_password_id + 1))
-		echo "$new_password_id,$service,$username,$password" >> vault.txt
-		echo "Password saved succesfully"
-		echo "------------------------------"
-		echo
+		existing_entry=$(awk -F ',' -v serv="$service" '$2 == serv {print  $0}' vault.txt)
+		if [ -n "$existing_entry" ]; then
+			echo "Password entry already exists for $service. Please update."
+			echo "------------------------------"
+			echo
+		else
+			read -p "Enter the username: " username
+			read -p "Enter the password: " password
+			last_entry_id=$(tail -n 1 vault.txt | awk -F ',' '{print $1}')
+			new_password_id=$((last_entry_id + 1))
+			echo "$new_password_id,$service,$username,$password" >> vault.txt
+			echo "Password saved succesfully"
+			echo "------------------------------"
+			echo
+		fi
 		;;
 
 		2) 
