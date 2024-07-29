@@ -106,7 +106,6 @@ view(){
 			echo -e "${RED}Invalid selection${NC}"
 			echo "------------------------------"
 			echo
-			break
 		fi
 	done
 }
@@ -184,7 +183,6 @@ delete(){
 			echo -e "${RED}Invalid selection${NC}"
 			echo "------------------------------"
 			echo
-			break
 		fi
 	done
 }
